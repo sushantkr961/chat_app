@@ -1,4 +1,4 @@
-const { Schema } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
 const userModel = Schema(
   {
@@ -9,6 +9,7 @@ const userModel = Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
@@ -16,7 +17,7 @@ const userModel = Schema(
     },
     pic: {
       type: String,
-      required: true,
+      // required: true,
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
