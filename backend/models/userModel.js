@@ -1,6 +1,7 @@
-const { Schema, model } = require("mongoose");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const userModel = Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -10,6 +11,7 @@ const userModel = Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true, // Convert email to lowercase before saving
     },
     password: {
       type: String,
@@ -17,13 +19,34 @@ const userModel = Schema(
     },
     pic: {
       type: String,
-      // required: true,
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-const User = model("User", userModel);
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(this.password, salt);
+    this.password = hashedPassword;
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+});
+
+const User = mongoose.model("User", userSchema);
+
 module.exports = User;

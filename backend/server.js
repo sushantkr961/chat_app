@@ -3,6 +3,7 @@ const express = require("express");
 
 const userRoutes = require("./routes/user.routes");
 const chatRoutes = require("./routes/chat.routes");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 // console.log(chats);
 
 const app = express();
@@ -19,6 +20,9 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
 
 const start = async () => {
   try {
